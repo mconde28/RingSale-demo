@@ -31,18 +31,20 @@
 <!-- ============ APP ============ -->
 <section id="screen-app" hidden>
   <header class="app-header">
-    <img src="/icons/icon-192.png" class="hdr-logo" alt="">
-    <div class="hdr-title">RingSale <span class="demo-badge">DEMO</span></div>
-    <div class="hdr-vendor-row">
-      <span class="vendor-chip" id="hdr-vendor"></span>
-      <button class="hdr-switch" onclick="logout()">&#8646; Switch vendor</button>
+    <div class="hdr-row">
+      <img src="/icons/icon-192.png" class="hdr-logo" alt="">
+      <div class="hdr-title">RingSale <span class="demo-badge">DEMO</span></div>
+      <div class="hdr-vendor-row">
+        <span class="vendor-chip" id="hdr-vendor"></span>
+        <button class="hdr-switch" onclick="logout()">&#8646; Switch vendor</button>
+      </div>
+      <nav class="tabs">
+        <button class="tab active" data-tab="sell" onclick="showTab('sell')">Sell</button>
+        <button class="tab" data-tab="menu" onclick="showTab('menu')">Menu</button>
+        <button class="tab" data-tab="reports" onclick="showTab('reports')">Reports</button>
+      </nav>
     </div>
     <div class="hdr-meta"><span class="hdr-day" id="hdr-day"></span><span class="save-ind" id="save-ind"><span class="dot"></span>Saved on this device</span><span class="app-version" id="app-version"></span></div>
-    <nav class="tabs">
-      <button class="tab active" data-tab="sell" onclick="showTab('sell')">Sell</button>
-      <button class="tab" data-tab="menu" onclick="showTab('menu')">Menu</button>
-      <button class="tab" data-tab="reports" onclick="showTab('reports')">Reports</button>
-    </nav>
   </header>
 
   <main>

@@ -63,7 +63,7 @@ input,select{font:inherit;}
 .vc-go{font-size:28px; color:var(--vc); font-weight:800; line-height:1;}
 
 /* ---------- header vendor row ---------- */
-.hdr-vendor-row{display:flex; align-items:center; gap:10px; margin:8px 0;}
+.hdr-vendor-row{display:flex; align-items:center; gap:8px; margin:0;}
 .vendor-chip{background:rgba(255,255,255,.16); padding:5px 12px; border-radius:999px; font-weight:700; font-size:13px;}
 .hdr-switch{
   background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.35); color:#fff;
@@ -76,30 +76,34 @@ input,select{font:inherit;}
   padding-top:calc(8px + env(safe-area-inset-top,0px));
   position:sticky; top:0; z-index:50;
 }
-.hdr-row{display:flex; align-items:center; gap:10px;}
+.hdr-row{display:flex; align-items:center; gap:8px 10px; flex-wrap:wrap;}
 .hdr-logo{width:30px; height:30px; border-radius:8px;}
-.hdr-title{font-size:17px; font-weight:800; flex:1;}
+.hdr-title{font-size:17px; font-weight:800;}
 .hdr-day{font-size:12px; opacity:.85;}
 .hdr-meta{display:flex; align-items:center; gap:10px; font-size:12px;}
 .save-ind{display:inline-flex; align-items:center; gap:6px; color:rgba(255,255,255,.9); font-weight:600; font-size:12px;}
 .save-ind .dot{width:8px; height:8px; border-radius:50%; background:#4ade80; box-shadow:0 0 0 3px rgba(74,222,128,.18);}
 .save-ind.inline{color:var(--muted);}
 .app-version{font-size:11px; opacity:.7; font-weight:700;}
-.tabs{display:flex; gap:8px; margin-top:8px;}
+.tabs{display:flex; gap:8px; margin-top:0; flex:1 1 100%;}
 .tab{
-  flex:1; padding:7px; border-radius:10px; border:1px solid rgba(255,255,255,.25);
+  flex:1 1 0; padding:7px 8px; border-radius:10px; border:1px solid rgba(255,255,255,.25);
   background:rgba(255,255,255,.08); color:#fff; font-weight:700; min-height:38px;
 }
 .tab.active{background:#fff; color:var(--brand-darker);}
+@media(min-width:860px){
+  .tabs{flex:0 0 auto; margin-left:auto;}
+  .tab{flex:0 0 auto; padding:7px 24px;}
+}
 main{padding:12px 16px 48px; max-width:1200px; margin:0 auto;}
 
 /* ---------- sell layout ---------- */
 .sell-layout{display:grid; gap:16px; grid-template-columns:1fr;}
 @media(min-width:860px){
   .sell-layout{grid-template-columns:1fr 380px; align-items:start;}
-  .ticket-pane{position:sticky; top:118px;}
+  .ticket-pane{position:sticky; top:100px;}
 }
-.chips{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+.chips{display:flex; gap:8px; flex-wrap:nowrap; overflow-x:auto; margin-bottom:10px; -webkit-overflow-scrolling:touch;}
 .chip{
   padding:7px 13px; border-radius:999px; border:1px solid var(--line);
   background:var(--paper); font-weight:600; font-size:13px; min-height:36px;
