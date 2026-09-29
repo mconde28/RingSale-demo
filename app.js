@@ -5,7 +5,7 @@ const $=s=>document.querySelector(s);
 const R=n=>Math.round(n*100)/100;
 const M=n=>'$'+R(n).toFixed(2);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const APP_VERSION='v8';   // bump with the SW cache version on every deploy
+const APP_VERSION='v9';   // bump with the SW cache version on every deploy
 
 /* ---------------- menu data ---------------- */
 const TACO_ADDONS=[
