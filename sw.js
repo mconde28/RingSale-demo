@@ -1,5 +1,5 @@
 /* RingSale POS Demo service worker — precaches the app shell for offline use. */
-const CACHE = 'ringsale-demo-v11';
+const CACHE = 'ringsale-demo-v12';
 const ASSETS = [
   '/',
   '/index.html',

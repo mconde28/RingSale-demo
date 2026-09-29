@@ -36,6 +36,7 @@ openCloseDay();
 document.querySelector('#cd-loc').value='Test Stall';
 confirmCloseDay();
 console.log('closed drawer saved:', JSON.stringify(closedDays[0].drawer), '| opening reset:', drawerOpening===0, '| sales cleared:', sales.length===0);
+console.log('close lands on closed view:', viewingClosed===0);
 viewClosedDay(0);
 const repHtml=document.querySelector('#reports-body').innerHTML;
 console.log('closed view shows drawer card:', repHtml.includes('Cash drawer')&&repHtml.includes('Dropped'));

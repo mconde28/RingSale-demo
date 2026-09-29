@@ -5,7 +5,7 @@ const $=s=>document.querySelector(s);
 const R=n=>Math.round(n*100)/100;
 const M=n=>'$'+R(n).toFixed(2);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const APP_VERSION='v11';   // bump with the SW cache version on every deploy
+const APP_VERSION='v12';   // bump with the SW cache version on every deploy
 
 /* ---------------- menu data ---------------- */
 const TACO_ADDONS=[
@@ -707,7 +707,8 @@ function confirmCloseDay(){
   const df=drawerFigures();
   closedDays.unshift({loc:loc,at:new Date(),sales:sales,
     drawer:{opening:df.opening,cashSales:df.cashSales,expected:df.expected,drop:df.drop}});
-  sales=[];ticket=[];discountPct=0;ticketNote='';drawerOpening=0;viewingClosed=-1;
+  sales=[];ticket=[];discountPct=0;ticketNote='';drawerOpening=0;
+  viewingClosed=0; /* land on the just-closed day's report */
   saveState();closeModal();renderTicket();renderReports();
 }
 function viewClosedDay(i){viewingClosed=i;renderReports();}
