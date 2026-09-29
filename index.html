@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RingSale POS Demo</title>
+<meta name="description" content="RingSale point-of-sale demo for market and food-truck vendors.">
+<meta name="theme-color" content="#d61f2c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RingSale">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<section id="screen-login" class="login-wrap">
+  <div class="login-card">
+    <img src="/icons/icon-192.png" class="login-logo" alt="RingSale logo">
+    <h1>RingSale</h1>
+    <span class="demo-badge big">DEMO</span>
+    <p class="tagline">Point of sale for market &amp; food-truck vendors</p>
+    <p class="pick-label">Choose a vendor to sign in to their register:</p>
+    <div class="vendor-list" id="vendor-list"></div>
+    <p class="hint">Demo — each vendor gets their own menu, ticket, sales &amp; reports.</p>
+  </div>
+</section>
+
+<!-- ============ APP ============ -->
+<section id="screen-app" hidden>
+  <header class="app-header">
+    <img src="/icons/icon-192.png" class="hdr-logo" alt="">
+    <div class="hdr-title">RingSale <span class="demo-badge">DEMO</span></div>
+    <div class="hdr-vendor-row">
+      <span class="vendor-chip" id="hdr-vendor"></span>
+      <button class="hdr-switch" onclick="logout()">&#8646; Switch vendor</button>
+    </div>
+    <div class="hdr-meta"><span class="hdr-day" id="hdr-day"></span><span class="save-ind" id="save-ind"><span class="dot"></span>Saved on this device</span></div>
+    <nav class="tabs">
+      <button class="tab active" data-tab="sell" onclick="showTab('sell')">Sell</button>
+      <button class="tab" data-tab="menu" onclick="showTab('menu')">Menu</button>
+      <button class="tab" data-tab="reports" onclick="showTab('reports')">Reports</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- SELL -->
+    <div id="tab-sell" class="tabpane">
+      <div class="sell-layout">
+        <div class="menu-pane">
+          <div id="cat-chips" class="chips"></div>
+          <div id="menu-grid" class="menu-grid"></div>
+        </div>
+        <aside class="ticket-pane" id="ticket-pane">
+          <h2>Current Ticket</h2>
+          <div id="ticket-lines" class="ticket-lines"></div>
+          <div class="discount-row" id="discount-row"></div>
+          <div class="totals" id="ticket-totals"></div>
+          <div class="tender-row" id="tender-row">
+            <button class="btn tender" onclick="openTender('cash')">Cash</button>
+            <button class="btn tender" onclick="openTender('zelle')">Zelle</button>
+            <button class="btn tender" onclick="openTender('venmo')">Venmo</button>
+            <button class="btn tender" onclick="openTender('card')">Other card</button>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- MENU ADMIN -->
+    <div id="tab-menu" class="tabpane" hidden>
+      <div class="admin-head">
+        <h2>Menu</h2>
+        <button class="btn primary" onclick="openMenuEdit(null)">+ Add Item</button>
+      </div>
+      <div id="menu-admin-list" class="admin-list"></div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="tab-reports" class="tabpane" hidden>
+      <div id="reports-body"></div>
+    </div>
+  </main>
+</section>
+
+<!-- ============ MODAL ============ -->
+<div id="modal" class="modal-backdrop" hidden>
+  <div class="modal" id="modal-box" role="dialog" aria-modal="true"></div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
