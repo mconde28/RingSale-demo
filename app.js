@@ -87,6 +87,8 @@ let sales=[];             // today's sales
 let closedDays=[];        // {loc,at,sales}
 let saleSeq=1;
 let activeCat='All';
+let eightysix=false;          // 86 mode: tapping a menu item 86s / un-86s it instead of selling
+let ticketNote='';             // free-text note on the current ticket
 let viewingClosed=-1;     // index into closedDays, -1 = live day
 let cust=null;            // customization session {item,qty,sizeIdx,addons:[{on,onSide}]}
 let cashTender={total:0,tendered:0};
@@ -96,7 +98,7 @@ let cashPad='';               // keypad entry buffer for the cash tender screen
 let lastSavedAt=null;
 function snapshotState(){
   return {v:1,vendor:curVendor?curVendor.id:null,menu:MENU,sales:sales,closedDays:closedDays,ticket:ticket,
-    discountPct:discountPct,saleSeq:saleSeq,savedAt:new Date().toISOString()};
+    discountPct:discountPct,ticketNote:ticketNote,saleSeq:saleSeq,savedAt:new Date().toISOString()};
 }
 function reviveDates(){
   sales.forEach(function(s){s.at=new Date(s.at);});
@@ -110,6 +112,7 @@ function applyState(p){
   MENU=p.menu;sales=p.sales;closedDays=p.closedDays;
   ticket=Array.isArray(p.ticket)?p.ticket:[];
   discountPct=typeof p.discountPct==='number'?p.discountPct:0;
+  ticketNote=typeof p.ticketNote==='string'?p.ticketNote:'';
   saleSeq=p.saleSeq;lastSavedAt=p.savedAt?new Date(p.savedAt):null;
   reviveDates();
 }
@@ -202,16 +205,27 @@ function renderAll(){renderCats();renderMenu();renderTicket();}
 function renderCats(){
   $('#cat-chips').innerHTML=vendorCats().map(function(c){
     return '<button class="chip'+(c===activeCat?' active':'')+'" onclick="setCat(\''+c+'\')">'+esc(c)+'</button>';
-  }).join('');
+  }).join('')+'<button class="chip chip86'+(eightysix?' active':'')+'" onclick="toggle86()">86'+(eightysix?' ON':'')+'</button>';
 }
 function setCat(c){activeCat=c;renderCats();renderMenu();}
+function toggle86(){eightysix=!eightysix;renderCats();renderMenu();}
+function menuTap(id){
+  if(eightysix){
+    const it=MENU.find(function(i){return i.id===id;});
+    if(it){it.avail=!it.avail;saveState();renderMenu();}
+    return;
+  }
+  openCustomize(id);
+}
 function renderMenu(){
   const items=MENU.filter(function(i){return activeCat==='All'||i.cat===activeCat;});
-  $('#menu-grid').innerHTML=items.map(function(i){
-    return '<button class="menu-item'+(i.avail?'':' out')+'" onclick="openCustomize(\''+i.id+'\')">'+
+  const grid=$('#menu-grid');
+  grid.classList.toggle('mode86',eightysix);
+  grid.innerHTML=items.map(function(i){
+    return '<button class="menu-item'+(i.avail?'':' out')+'" onclick="menuTap(\''+i.id+'\')">'+
     '<span class="nm">'+esc(i.name)+'</span>'+
     '<span class="pr">'+M(i.price)+'</span>'+
-    '<span class="st">'+(i.avail?('In stock: '+i.stock):'Unavailable')+'</span>'+
+    '<span class="st">'+(eightysix?(i.avail?'Tap to 86':'86\u2019d — tap to restore'):(i.avail?('In stock: '+i.stock):'86\u2019d'))+'</span>'+
     '</button>';
   }).join('')||'<p class="ticket-empty">No items in this category.</p>';
 }
@@ -310,6 +324,11 @@ function renderTicket(){
     [0,5,10,15].map(function(p){
       return '<button class="disc-btn'+(discountPct===p?' active':'')+'" onclick="setDiscount('+p+')">'+p+'%</button>';
     }).join('');
+  $('#note-row').innerHTML=ticket.length?
+    (ticketNote
+      ? '<div class="tnote"><span>'+esc(ticketNote)+'</span><button class="linklike" onclick="editNote()">Edit</button></div>'
+      : '<button class="btn note-btn" onclick="editNote()">+ Note</button>')
+    :'';
   $('#ticket-totals').innerHTML=
     '<div class="r"><span>Subtotal</span><span>'+M(sub)+'</span></div>'+
     (disc>0?'<div class="r"><span>Discount ('+discountPct+'%)</span><span>−'+M(disc)+'</span></div>':'')+
@@ -324,6 +343,15 @@ function lineQty(key,d){
 }
 function lineRemove(key){ticket=ticket.filter(function(x){return x.key!==key;});saveState();renderTicket();}
 function setDiscount(p){discountPct=p;saveState();renderTicket();}
+function editNote(){
+  openModal('<h2>Ticket note</h2><div class="sub">Shows on the ticket and saves with the sale. Good for allergies, "no onions", etc.</div>'+
+   '<textarea id="note-text" rows="3" style="width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit" placeholder="Type note\u2026">'+esc(ticketNote)+'</textarea>'+
+   '<div class="modal-actions"><button class="btn" onclick="closeModal()">Cancel</button>'+
+   (ticketNote?'<button class="btn" onclick="clearNote()">Clear</button>':'')+
+   '<button class="btn primary" onclick="saveNote()">Save note</button></div>');
+}
+function saveNote(){const t=$('#note-text');ticketNote=t?t.value.trim():'';saveState();closeModal();renderTicket();}
+function clearNote(){ticketNote='';saveState();closeModal();renderTicket();}
 
 /* ---------------- tender ---------------- */
 function openTender(type){
@@ -403,20 +431,21 @@ function completeSale(tender,tendered,change){
       sl[curVendor.countKey]=l[curVendor.countKey]||0;
       return sl;
     }),
-    sub:sub,disc:R(sub-tot),total:tot,tender:tender,tendered:R(tendered),change:R(change)
+    sub:sub,disc:R(sub-tot),total:tot,tender:tender,tendered:R(tendered),change:R(change),note:ticketNote
   };
   sale.lines.forEach(function(sl){
     const m=MENU.find(function(i){return i.id===sl.itemId;});
     if(m)m.stock=Math.max(0,m.stock-sl.qty);
   });
   sales.push(sale);
-  ticket=[];discountPct=0;
+  ticket=[];discountPct=0;ticketNote='';
   saveState();renderTicket();
   const rows=sale.lines.map(function(l){
     return '<div class="r" style="display:flex;justify-content:space-between"><span>'+l.qty+' × '+esc(l.name)+'</span><span>'+M(l.total)+'</span></div>';
   }).join('');
   openModal('<h2>Sale complete</h2><div class="sub">'+sale.id+' · '+esc(tender)+'</div>'+
    (tender==='Cash'&&change>0?'<div class="change-big"><div class="cb-label">Change due</div><div class="cb-amt">'+M(change)+'</div></div>':'')+
+   (sale.note?'<div class="tnote" style="margin-bottom:10px"><span>'+esc(sale.note)+'</span></div>':'')+
    '<div class="receipt">'+rows+
    '<div style="margin-top:6px;border-top:1px solid #e7e5e4;padding-top:6px;display:flex;justify-content:space-between;font-weight:800"><span>Total</span><span>'+M(tot)+'</span></div></div>'+
    '<div class="modal-actions"><button class="btn primary" onclick="closeModal();showTab(\'reports\')">View reports</button>'+
