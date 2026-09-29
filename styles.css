@@ -175,6 +175,11 @@ main{padding:16px; max-width:1200px; margin:0 auto; padding-bottom:48px;}
 .cash-due .amt{font-size:40px; font-weight:800; color:var(--brand-darker);}
 .cash-tendered{display:flex; justify-content:space-between; font-size:18px; font-weight:700; margin:8px 0;}
 .cash-tendered .chg{color:var(--ok);}
+.change-big{text-align:center; margin:10px 0; padding:12px 8px; background:#f0fdf4; border:2px solid var(--ok); border-radius:14px;}
+.change-big.due{background:#fef2f2; border-color:var(--danger);}
+.cb-label{font-size:12px; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); font-weight:700;}
+.cb-amt{font-size:54px; font-weight:800; color:var(--ok); line-height:1.15;}
+.change-big.due .cb-amt{color:var(--danger);}
 .bill-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:10px 0;}
 .bill{font-size:18px; font-weight:800; padding:14px 0;}
 .bill.roundup{grid-column:span 2; background:#fee2e2; border-color:#fca5a5; color:#7c0d18;}

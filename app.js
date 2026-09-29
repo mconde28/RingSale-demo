@@ -344,8 +344,9 @@ function renderCash(){
   const up=Math.ceil(due-1e-9);
   openModal('<h2>Cash payment</h2><div class="sub">Tap the bills the customer hands you.</div>'+
    '<div class="cash-due"><div class="amt">'+M(due)+'</div><div class="sub">amount due</div></div>'+
-   '<div class="cash-tendered"><span>Tendered: '+M(td)+'</span>'+
-   (change>=0?'<span class="chg">Change: '+M(change)+'</span>':'<span>Still due: '+M(-change)+'</span>')+'</div>'+
+   '<div class="cash-tendered"><span>Tendered: '+M(td)+'</span></div>'+
+   (change>=0?'<div class="change-big"><div class="cb-label">Change due</div><div class="cb-amt">'+M(change)+'</div></div>'
+             :'<div class="change-big due"><div class="cb-label">Still due</div><div class="cb-amt">'+M(-change)+'</div></div>')+
    '<div class="bill-grid">'+bills+
    '<button class="btn bill roundup" onclick="cashRoundUp()">Round up · '+M(up)+'</button></div>'+
    '<div style="display:flex;gap:8px;margin-bottom:8px"><button class="btn" style="flex:1" onclick="cashExact()">Exact '+M(due)+'</button>'+
@@ -414,7 +415,8 @@ function completeSale(tender,tendered,change){
   const rows=sale.lines.map(function(l){
     return '<div class="r" style="display:flex;justify-content:space-between"><span>'+l.qty+' × '+esc(l.name)+'</span><span>'+M(l.total)+'</span></div>';
   }).join('');
-  openModal('<h2>Sale complete</h2><div class="sub">'+sale.id+' · '+esc(tender)+(tender==='Cash'?' · Change '+M(change):'')+'</div>'+
+  openModal('<h2>Sale complete</h2><div class="sub">'+sale.id+' · '+esc(tender)+'</div>'+
+   (tender==='Cash'&&change>0?'<div class="change-big"><div class="cb-label">Change due</div><div class="cb-amt">'+M(change)+'</div></div>':'')+
    '<div class="receipt">'+rows+
    '<div style="margin-top:6px;border-top:1px solid #e7e5e4;padding-top:6px;display:flex;justify-content:space-between;font-weight:800"><span>Total</span><span>'+M(tot)+'</span></div></div>'+
    '<div class="modal-actions"><button class="btn primary" onclick="closeModal();showTab(\'reports\')">View reports</button>'+
