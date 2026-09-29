@@ -5,7 +5,7 @@ const $=s=>document.querySelector(s);
 const R=n=>Math.round(n*100)/100;
 const M=n=>'$'+R(n).toFixed(2);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const APP_VERSION='v10';   // bump with the SW cache version on every deploy
+const APP_VERSION='v11';   // bump with the SW cache version on every deploy
 
 /* ---------------- menu data ---------------- */
 const TACO_ADDONS=[
@@ -92,6 +92,7 @@ let saleSeq=1;
 let activeCat='All';
 let eightysix=false;          // 86 mode: tapping a menu item 86s / un-86s it instead of selling
 let ticketNote='';             // free-text note on the current ticket
+let drawerOpening=0;          // cash float at start of day ("the bank")
 let viewingClosed=-1;     // index into closedDays, -1 = live day
 let cust=null;            // customization session {item,qty,sizeIdx,addons:[{on,onSide}]}
 let cashTender={total:0,tendered:0};
@@ -101,7 +102,7 @@ let cashPad='';               // keypad entry buffer for the cash tender screen
 let lastSavedAt=null;
 function snapshotState(){
   return {v:1,vendor:curVendor?curVendor.id:null,menu:MENU,sales:sales,closedDays:closedDays,ticket:ticket,
-    discountPct:discountPct,ticketNote:ticketNote,saleSeq:saleSeq,savedAt:new Date().toISOString()};
+    discountPct:discountPct,ticketNote:ticketNote,drawerOpening:drawerOpening,saleSeq:saleSeq,savedAt:new Date().toISOString()};
 }
 function reviveDates(){
   sales.forEach(function(s){s.at=new Date(s.at);});
@@ -117,6 +118,7 @@ function applyState(p){
   ticket=Array.isArray(p.ticket)?p.ticket:[];
   discountPct=typeof p.discountPct==='number'?p.discountPct:0;
   ticketNote=typeof p.ticketNote==='string'?p.ticketNote:'';
+  drawerOpening=typeof p.drawerOpening==='number'?p.drawerOpening:0;
   saleSeq=p.saleSeq;lastSavedAt=p.savedAt?new Date(p.savedAt):null;
   reviveDates();
 }
@@ -132,7 +134,7 @@ function backfillMenuFields(){
 }
 function resetToDefaults(){
   MENU=deepCopy(curVendor.sampleMenu);sales=[];closedDays=[];saleSeq=1;
-  ticket=[];discountPct=0;viewingClosed=-1;activeCat='All';lastSavedAt=null;
+  ticket=[];discountPct=0;ticketNote='';drawerOpening=0;viewingClosed=-1;activeCat='All';lastSavedAt=null;
   saveState(); /* persist the clean snapshot so the device always holds valid data */
 }
 function saveState(){
@@ -610,6 +612,14 @@ function renderReports(){
   if(!live){
     const cd=closedDays[viewingClosed];
     html+='<div class="closed-banner"><strong>Viewing closed day — '+esc(cd.loc)+'</strong><button class="btn" onclick="backToLive()">Back to today</button></div>';
+    if(cd.drawer){
+      html+='<div class="rep-sec"><h3>Cash drawer</h3><div class="drawer-box">'+
+       '<div class="dr-row"><span>Opening cash (bank)</span><strong>'+M(cd.drawer.opening)+'</strong></div>'+
+       '<div class="dr-row"><span>Cash sales</span><strong>'+M(cd.drawer.cashSales)+'</strong></div>'+
+       '<div class="dr-row total"><span>Expected in drawer</span><strong>'+M(cd.drawer.expected)+'</strong></div>'+
+       '<div class="dr-row total"><span>Dropped</span><strong>'+M(cd.drawer.drop)+'</strong></div>'+
+       '</div></div>';
+    }
   }
   html+='<div class="cards">'+card(M(s.gross),'Gross sales')+card(String(s.orders),'Orders')+
     card(s.orders?M(R(s.gross/s.orders)):'$0.00','Avg ticket')+
@@ -638,7 +648,18 @@ function renderReports(){
     list.slice().reverse().slice(0,20).map(function(sa){
       return [sa.id,String(sa.lines.reduce(function(n,l){return n+l.qty;},0)),esc(sa.tender),M(sa.total)];
     })):'<p class="zero">No orders yet.</p>')+'</div>';
-  if(live)html+='<div class="rep-sec"><h3>End of day</h3><p class="sub" style="margin-bottom:10px">Close and save the day when you finish or move locations.</p><button class="btn primary big" onclick="openCloseDay()">Close &amp; Save Day</button></div>';
+  if(live){
+    const df=drawerFigures();
+    html+='<div class="rep-sec"><h3>Cash drawer</h3>'+
+     '<div class="drawer-box">'+
+     '<div class="dr-row"><span>Opening cash (bank)</span><strong>'+(drawerOpening>0?M(drawerOpening):'<span class="zero">Not set</span>')+'</strong></div>'+
+     '<div class="dr-row"><span>Cash sales so far</span><strong>'+M(df.cashSales)+'</strong></div>'+
+     '<div class="dr-row total"><span>Expected in drawer</span><strong>'+M(df.expected)+'</strong></div>'+
+     '</div>'+
+     '<div class="form-row" style="margin-top:10px"><label>Opening cash — count the drawer at start of day</label><input id="drawer-open" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" value="'+(drawerOpening>0?drawerOpening.toFixed(2):'')+'"></div>'+
+     '<button class="btn" onclick="setDrawerOpening()">Set opening cash</button></div>';
+    html+='<div class="rep-sec"><h3>End of day</h3><p class="sub" style="margin-bottom:10px">Close and save the day when you finish or move locations. You get the full close-out report — expected cash and what to pull.</p><button class="btn primary big" onclick="openCloseDay()">Close &amp; Save Day</button></div>';
+  }
   if(closedDays.length){
     html+='<div class="rep-sec"><h3>Closed days</h3>'+repTable(['Location','Closed','Orders','Total',''],
       closedDays.map(function(cd,i){
@@ -652,18 +673,41 @@ function renderReports(){
    '<button class="btn warn" onclick="openResetData()">Reset demo data</button></div>';
   $('#reports-body').innerHTML=html;
 }
-function openCloseDay(){
+function drawerFigures(){
   const s=summarize(sales);
-  openModal('<h2>Close &amp; save day</h2><div class="sub">'+s.orders+' orders · '+M(s.gross)+' gross. The live report resets; this day stays viewable.</div>'+
+  const cashSales=s.tenders['Cash']||0;
+  const expected=R(drawerOpening+cashSales);
+  return {opening:drawerOpening,cashSales:cashSales,expected:expected,drop:R(expected-drawerOpening),
+    orders:s.orders,gross:s.gross,tenders:s.tenders};
+}
+function setDrawerOpening(){
+  const el=$('#drawer-open');
+  const v=el?parseFloat(el.value):NaN;
+  drawerOpening=isNaN(v)||v<0?0:R(v);
+  saveState();renderReports();
+}
+function openCloseDay(){
+  const df=drawerFigures();
+  const tn=Object.keys(df.tenders);
+  openModal('<h2>Close-out report</h2><div class="sub">'+df.orders+' orders · '+M(df.gross)+' gross</div>'+
+   '<div class="drawer-box">'+
+   '<div class="dr-row"><span>Opening cash (bank)</span><strong>'+M(df.opening)+'</strong></div>'+
+   '<div class="dr-row"><span>+ Cash sales</span><strong>'+M(df.cashSales)+'</strong></div>'+
+   '<div class="dr-row total"><span>= Expected in drawer</span><strong>'+M(df.expected)+'</strong></div>'+
+   '</div>'+
+   '<div class="drop-big"><div class="cb-label">Pull out — leave the bank</div><div class="cb-amt">'+M(df.drop)+'</div></div>'+
+   (tn.length?'<div class="glbl" style="margin-top:4px">Tender breakdown</div>'+repTable(['Tender','Total'],tn.map(function(k){return[esc(k),M(df.tenders[k])];})):'')+
    '<div class="form-row"><label>Location</label><input id="cd-loc" value="'+esc(curVendor.defLoc)+'"></div>'+
-   '<div class="modal-actions"><button class="btn" onclick="closeModal()">Cancel</button>'+
-   '<button class="btn primary" onclick="confirmCloseDay()">Close day</button></div>');
+   '<div class="modal-actions"><button class="btn" onclick="closeModal()">Not yet</button>'+
+   '<button class="btn primary" onclick="confirmCloseDay()">Close &amp; Save Day</button></div>');
 }
 function confirmCloseDay(){
   const defLoc=curVendor?curVendor.defLoc:'Main Stall';
-  const loc=String($('#cd-loc').value||defLoc).trim()||defLoc;
-  closedDays.unshift({loc:loc,at:new Date(),sales:sales});
-  sales=[];ticket=[];discountPct=0;viewingClosed=-1;
+  const loc=String(($('#cd-loc')||{}).value||defLoc).trim()||defLoc;
+  const df=drawerFigures();
+  closedDays.unshift({loc:loc,at:new Date(),sales:sales,
+    drawer:{opening:df.opening,cashSales:df.cashSales,expected:df.expected,drop:df.drop}});
+  sales=[];ticket=[];discountPct=0;ticketNote='';drawerOpening=0;viewingClosed=-1;
   saveState();closeModal();renderTicket();renderReports();
 }
 function viewClosedDay(i){viewingClosed=i;renderReports();}

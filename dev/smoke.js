@@ -26,6 +26,19 @@ console.log('backfill restored ingredients:', Array.isArray(it.ingredients)&&it.
 completeSale("Cash",20,R(20-ticketTotal()));
 const s=sales[sales.length-1];
 console.log('sale holds saved:', JSON.stringify(s.lines[0].holds), '| change:', s.change);
+// drawer: set opening cash, verify figures, close the day, verify closed-day drawer card
+renderReports();
+document.querySelector('#drawer-open').value='100';
+setDrawerOpening();
+const df2=drawerFigures();
+console.log('drawer opening set:', drawerOpening===100, '| expected 110.75:', df2.expected===110.75, '| drop===cashSales:', df2.drop===df2.cashSales);
+openCloseDay();
+document.querySelector('#cd-loc').value='Test Stall';
+confirmCloseDay();
+console.log('closed drawer saved:', JSON.stringify(closedDays[0].drawer), '| opening reset:', drawerOpening===0, '| sales cleared:', sales.length===0);
+viewClosedDay(0);
+const repHtml=document.querySelector('#reports-body').innerHTML;
+console.log('closed view shows drawer card:', repHtml.includes('Cash drawer')&&repHtml.includes('Dropped'));
 })();
 `;
 eval(fs.readFileSync(__dirname+'/../app.js','utf8')+driver);
