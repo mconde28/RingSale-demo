@@ -5,6 +5,7 @@ const $=s=>document.querySelector(s);
 const R=n=>Math.round(n*100)/100;
 const M=n=>'$'+R(n).toFixed(2);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const APP_VERSION='v7';   // bump with the SW cache version on every deploy
 
 /* ---------------- menu data ---------------- */
 const TACO_ADDONS=[
@@ -184,6 +185,7 @@ function loginAs(vid){
   $('#screen-app').hidden=false;
   const d=new Date();
   $('#hdr-day').textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  $('#app-version').textContent=APP_VERSION;
   showTab('sell');
   renderAll();renderMenuAdmin();renderReports();updateSaveIndicator();
 }
