@@ -21,16 +21,16 @@ const FRESCA_FLAVORS={label:'Flavor',choices:[{name:'Horchata',delta:0},{name:'J
 let STORE_KEY='fiveanddime-demo-v1';
 let curVendor=null;              // the logged-in vendor (see VENDORS below)
 const SAMPLE_MENU=[
- {id:'birria',name:'Birria Taco',cat:'Tacos',price:3.50,stock:60,avail:true,addons:TACO_ADDONS},
- {id:'alpastor',name:'Al Pastor Taco',cat:'Tacos',price:3.00,stock:60,avail:true,addons:TACO_ADDONS},
- {id:'carnitas',name:'Carnitas Taco',cat:'Tacos',price:3.25,stock:60,avail:true,addons:TACO_ADDONS},
- {id:'fish',name:'Baja Fish Taco',cat:'Tacos',price:4.00,stock:40,avail:true,addons:TACO_ADDONS},
+ {id:'birria',name:'Birria Taco',cat:'Tacos',price:3.50,stock:60,avail:true,addons:TACO_ADDONS,ingredients:TACO_BUILD},
+ {id:'alpastor',name:'Al Pastor Taco',cat:'Tacos',price:3.00,stock:60,avail:true,addons:TACO_ADDONS,ingredients:TACO_BUILD},
+ {id:'carnitas',name:'Carnitas Taco',cat:'Tacos',price:3.25,stock:60,avail:true,addons:TACO_ADDONS,ingredients:TACO_BUILD},
+ {id:'fish',name:'Baja Fish Taco',cat:'Tacos',price:4.00,stock:40,avail:true,addons:TACO_ADDONS,ingredients:['Cabbage','Crema','Lime','Pico de Gallo']},
  {id:'pack6',name:'Taco Pack (6)',cat:'Taco Packs',price:18.00,stock:12,avail:true,tacoCount:6,addons:TACO_ADDONS},
  {id:'pack12',name:'Taco Pack (12)',cat:'Taco Packs',price:34.00,stock:8,avail:true,tacoCount:12,addons:TACO_ADDONS},
  {id:'jarritos',name:'Mango Jarritos',cat:'Drinks',price:2.50,stock:48,avail:true,opt:DRINK_SIZES},
  {id:'coke',name:'Mexican Coke',cat:'Drinks',price:2.50,stock:36,avail:true},
  {id:'fresca',name:'Agua Fresca',cat:'Drinks',price:3.00,stock:24,avail:true,opt:FRESCA_FLAVORS},
- {id:'elote',name:'Elote (Street Corn)',cat:'Sides',price:4.50,stock:30,avail:true,addons:[{name:'Extra Cotija',price:0.75},{name:'Extra Crema',price:0.50},{name:'Extra Lime',price:0.00}]},
+ {id:'elote',name:'Elote (Street Corn)',cat:'Sides',price:4.50,stock:30,avail:true,ingredients:['Cotija','Crema','Chili Powder','Lime','Cilantro'],addons:[{name:'Extra Cotija',price:0.75},{name:'Extra Crema',price:0.50},{name:'Extra Lime',price:0.00}]},
  {id:'chips',name:'Chips & Guac',cat:'Sides',price:5.00,stock:20,avail:true},
  {id:'churros',name:'Churros (3 pc)',cat:'Sides',price:4.00,stock:25,avail:true}
 ];
@@ -47,17 +47,19 @@ const FRIES_ADDONS=[
  {name:'Bacon Bits',price:1.25},
  {name:'Extra Seasoning',price:0.00}
 ];
+const CLASSIC_BUILD=['Lettuce','Tomato','Onion','Pickles','American Cheese','Smash Sauce','Potato Bun'];
+const TACO_BUILD=['Onion','Cilantro','Lime','Salsa'];
 const SHAKE_SIZES={label:'Size',choices:[{name:'Regular',delta:0},{name:'Large',delta:1.25}]};
 const BURGER_MENU=[
- {id:'smash',name:'Classic Smash Burger',cat:'Burgers',price:8.50,stock:40,avail:true,addons:BURGER_ADDONS},
- {id:'double',name:'Double Smash Burger',cat:'Burgers',price:11.50,stock:30,avail:true,addons:BURGER_ADDONS},
- {id:'baconjam',name:'Bacon Jam Smash',cat:'Burgers',price:10.75,stock:25,avail:true,addons:BURGER_ADDONS},
- {id:'shroom',name:'Mushroom Swiss Burger',cat:'Burgers',price:9.75,stock:20,avail:true,addons:BURGER_ADDONS},
- {id:'chicken',name:'Crispy Chicken Sandwich',cat:'Burgers',price:8.75,stock:25,avail:true},
- {id:'combo',name:'Smash Combo',cat:'Combos',price:13.50,stock:20,avail:true,packCount:1,addons:FRIES_ADDONS},
- {id:'dblcombo',name:'Double Combo',cat:'Combos',price:16.50,stock:12,avail:true,packCount:2,addons:FRIES_ADDONS},
+ {id:'smash',name:'Classic Smash Burger',cat:'Burgers',price:8.50,stock:40,avail:true,addons:BURGER_ADDONS,ingredients:CLASSIC_BUILD},
+ {id:'double',name:'Double Smash Burger',cat:'Burgers',price:11.50,stock:30,avail:true,addons:BURGER_ADDONS,ingredients:CLASSIC_BUILD},
+ {id:'baconjam',name:'Bacon Jam Smash',cat:'Burgers',price:10.75,stock:25,avail:true,addons:BURGER_ADDONS,ingredients:['Bacon Jam','Lettuce','Tomato','Onion','Cheddar','Brioche Bun']},
+ {id:'shroom',name:'Mushroom Swiss Burger',cat:'Burgers',price:9.75,stock:20,avail:true,addons:BURGER_ADDONS,ingredients:['Mushrooms','Swiss Cheese','Lettuce','Tomato','Garlic Aioli','Brioche Bun']},
+ {id:'chicken',name:'Crispy Chicken Sandwich',cat:'Burgers',price:8.75,stock:25,avail:true,ingredients:['Lettuce','Tomato','Pickles','Spicy Mayo','Brioche Bun']},
+ {id:'combo',name:'Smash Combo',cat:'Combos',price:13.50,stock:20,avail:true,packCount:1,addons:FRIES_ADDONS,ingredients:CLASSIC_BUILD},
+ {id:'dblcombo',name:'Double Combo',cat:'Combos',price:16.50,stock:12,avail:true,packCount:2,addons:FRIES_ADDONS,ingredients:CLASSIC_BUILD},
  {id:'fries',name:'Regular Fries',cat:'Sides',price:3.50,stock:50,avail:true},
- {id:'loadedfries',name:'Loaded Fries',cat:'Sides',price:5.50,stock:30,avail:true,addons:FRIES_ADDONS},
+ {id:'loadedfries',name:'Loaded Fries',cat:'Sides',price:5.50,stock:30,avail:true,addons:FRIES_ADDONS,ingredients:['Cheese Sauce','Bacon Bits','Jalapeños','Scallions','Sour Cream']},
  {id:'vshake',name:'Vanilla Shake',cat:'Shakes',price:5.00,stock:20,avail:true,opt:SHAKE_SIZES},
  {id:'cshake',name:'Chocolate Shake',cat:'Shakes',price:5.00,stock:20,avail:true,opt:SHAKE_SIZES},
  {id:'soda',name:'Fountain Drink',cat:'Drinks',price:2.50,stock:40,avail:true,opt:DRINK_SIZES}
@@ -111,11 +113,22 @@ function validState(p){
 }
 function applyState(p){
   MENU=p.menu;sales=p.sales;closedDays=p.closedDays;
+  backfillMenuFields(); /* sample updates (e.g. new ingredient lists) reach items saved before the update */
   ticket=Array.isArray(p.ticket)?p.ticket:[];
   discountPct=typeof p.discountPct==='number'?p.discountPct:0;
   ticketNote=typeof p.ticketNote==='string'?p.ticketNote:'';
   saleSeq=p.saleSeq;lastSavedAt=p.savedAt?new Date(p.savedAt):null;
   reviveDates();
+}
+function backfillMenuFields(){
+  if(!curVendor||!curVendor.sampleMenu)return;
+  MENU.forEach(function(m){
+    const s=curVendor.sampleMenu.find(function(x){return x.id===m.id;});
+    if(!s)return;
+    if(!m.ingredients&&s.ingredients)m.ingredients=s.ingredients.slice();
+    if(!m.addons&&s.addons)m.addons=deepCopy(s.addons);
+    if(!m.opt&&s.opt)m.opt=deepCopy(s.opt);
+  });
 }
 function resetToDefaults(){
   MENU=deepCopy(curVendor.sampleMenu);sales=[];closedDays=[];saleSeq=1;
@@ -236,7 +249,7 @@ function renderMenu(){
 function openCustomize(id){
   const item=MENU.find(function(i){return i.id===id;});
   if(!item||!item.avail)return;
-  cust={item:item,qty:1,sizeIdx:0,addons:(item.addons||[]).map(function(){return{on:false,onSide:false};})};
+  cust={item:item,qty:1,sizeIdx:0,holds:(item.ingredients||[]).map(function(){return false;}),addons:(item.addons||[]).map(function(){return{on:false,onSide:false};})};
   renderCustomize();
 }
 function custUnit(){
@@ -256,6 +269,14 @@ function renderCustomize(){
         ' onchange="custSize('+i+')"><span>'+esc(c.name)+'</span><span style="margin-left:auto;color:#78716c">'+(c.delta?'+'+M(c.delta):'Included')+'</span></label>';
       }).join('')+'</div>';
   }
+  let holdHtml='';
+  if(it.ingredients&&it.ingredients.length){
+    holdHtml='<div class="opt-group"><div class="glbl">Hold (leave off)</div><div class="holds">'+
+      it.ingredients.map(function(g,i){
+        const held=cust.holds[i];
+        return '<button class="hold'+(held?' held':'')+'" onclick="custHold('+i+')">'+(held?'NO ':'')+esc(g)+'</button>';
+      }).join('')+'</div></div>';
+  }
   let addonHtml='';
   if(it.addons&&it.addons.length){
     addonHtml='<div class="opt-group"><div class="glbl">Add-ons</div>'+
@@ -268,12 +289,13 @@ function renderCustomize(){
   }
   const det=[];
   if(it.opt)det.push(esc(it.opt.choices[cust.sizeIdx].name));
+  (it.ingredients||[]).forEach(function(g,i){if(cust.holds[i])det.push('No '+esc(g));});
   (it.addons||[]).forEach(function(a,i){
     if(cust.addons[i].on)det.push(esc(a.name)+(cust.addons[i].onSide?' (on the side)':''));
   });
   openModal(
     '<h2>'+esc(it.name)+'</h2><div class="sub">'+M(it.price)+' base · In stock: '+it.stock+'</div>'+
-    optHtml+addonHtml+
+    optHtml+holdHtml+addonHtml+
     '<div class="preview"><div class="pv-name">'+esc(it.name)+'</div>'+
     '<div class="pv-det">'+(det.join(' · ')||'Classic — no extras')+'</div>'+
     '<div class="pv-price">'+M(u)+' each</div></div>'+
@@ -284,6 +306,7 @@ function renderCustomize(){
 }
 function custSize(i){cust.sizeIdx=i;renderCustomize();}
 function custQty(d){const it=cust.item;cust.qty=Math.min(Math.max(1,cust.qty+d),Math.max(1,it.stock));renderCustomize();}
+function custHold(i){cust.holds[i]=!cust.holds[i];renderCustomize();}
 function custAddon(i){cust.addons[i].on=!cust.addons[i].on;if(!cust.addons[i].on)cust.addons[i].onSide=false;renderCustomize();}
 function custOnSide(i){const st=cust.addons[i];if(!st.on){st.on=true;st.onSide=true;}else{st.onSide=!st.onSide;}renderCustomize();}
 function addToTicket(){
@@ -292,10 +315,12 @@ function addToTicket(){
     const idx=it.addons.indexOf(a);
     return{name:a.name,price:a.price,onSide:cust.addons[idx].onSide};
   });
+  const holds=(it.ingredients||[]).filter(function(g,i){return cust.holds[i];});
   const line={
     key:'L'+Date.now()+Math.floor(Math.random()*999),
     itemId:it.id,name:it.name,cat:it.cat,qty:cust.qty,unit:u,
     size:it.opt?it.opt.choices[cust.sizeIdx].name:null,
+    holds:holds,
     addons:addons
   };
   line[curVendor.countKey]=it[curVendor.countKey]||0;
@@ -314,6 +339,7 @@ function renderTicket(){
     box.innerHTML=ticket.map(function(l){
       const det=[];
       if(l.size)det.push(esc(l.size));
+      (l.holds||[]).forEach(function(h){det.push('No '+esc(h));});
       l.addons.forEach(function(a){det.push(esc(a.name)+(a.onSide?' (side)':''));});
       return '<div class="tline"><div class="top"><span>'+esc(l.name)+'</span><span>'+M(R(l.unit*l.qty))+'</span></div>'+
       (det.length?'<div class="det">'+det.join(' · ')+'</div>':'')+
@@ -429,7 +455,7 @@ function completeSale(tender,tendered,change){
     at:new Date(),loc:curVendor.defLoc,
     lines:ticket.map(function(l){
       const sl={itemId:l.itemId,cat:l.cat,name:l.name,qty:l.qty,unit:l.unit,total:R(l.unit*l.qty),
-        size:l.size,addons:l.addons.map(function(a){return{name:a.name,price:a.price,onSide:a.onSide};})};
+        size:l.size,holds:l.holds||[],addons:l.addons.map(function(a){return{name:a.name,price:a.price,onSide:a.onSide};})};
       sl[curVendor.countKey]=l[curVendor.countKey]||0;
       return sl;
     }),
