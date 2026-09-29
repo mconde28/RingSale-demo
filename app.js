@@ -5,7 +5,7 @@ const $=s=>document.querySelector(s);
 const R=n=>Math.round(n*100)/100;
 const M=n=>'$'+R(n).toFixed(2);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const APP_VERSION='v12';   // bump with the SW cache version on every deploy
+const APP_VERSION='v13';   // bump with the SW cache version on every deploy
 
 /* ---------------- menu data ---------------- */
 const TACO_ADDONS=[
@@ -478,8 +478,7 @@ function completeSale(tender,tendered,change){
    (sale.note?'<div class="tnote" style="margin-bottom:10px"><span>'+esc(sale.note)+'</span></div>':'')+
    '<div class="receipt">'+rows+
    '<div style="margin-top:6px;border-top:1px solid #e7e5e4;padding-top:6px;display:flex;justify-content:space-between;font-weight:800"><span>Total</span><span>'+M(tot)+'</span></div></div>'+
-   '<div class="modal-actions"><button class="btn primary" onclick="closeModal();showTab(\'reports\')">View reports</button>'+
-   '<button class="btn" onclick="closeModal()">New sale</button></div>');
+   '<div class="modal-actions"><button class="btn primary" onclick="closeModal()">New sale</button></div>');
 }
 
 /* ---------------- menu admin ---------------- */
