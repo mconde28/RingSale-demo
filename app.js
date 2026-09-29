@@ -5,7 +5,7 @@ const $=s=>document.querySelector(s);
 const R=n=>Math.round(n*100)/100;
 const M=n=>'$'+R(n).toFixed(2);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const APP_VERSION='v9';   // bump with the SW cache version on every deploy
+const APP_VERSION='v10';   // bump with the SW cache version on every deploy
 
 /* ---------------- menu data ---------------- */
 const TACO_ADDONS=[
@@ -17,6 +17,8 @@ const TACO_ADDONS=[
 ];
 const DRINK_SIZES={label:'Size',choices:[{name:'Regular',delta:0},{name:'Large',delta:1.00}]};
 const FRESCA_FLAVORS={label:'Flavor',choices:[{name:'Horchata',delta:0},{name:'Jamaica',delta:0},{name:'Tamarindo',delta:0}]};
+const CLASSIC_BUILD=['Lettuce','Tomato','Onion','Pickles','American Cheese','Smash Sauce','Potato Bun'];
+const TACO_BUILD=['Onion','Cilantro','Lime','Salsa'];
 
 let STORE_KEY='fiveanddime-demo-v1';
 let curVendor=null;              // the logged-in vendor (see VENDORS below)
@@ -47,8 +49,6 @@ const FRIES_ADDONS=[
  {name:'Bacon Bits',price:1.25},
  {name:'Extra Seasoning',price:0.00}
 ];
-const CLASSIC_BUILD=['Lettuce','Tomato','Onion','Pickles','American Cheese','Smash Sauce','Potato Bun'];
-const TACO_BUILD=['Onion','Cilantro','Lime','Salsa'];
 const SHAKE_SIZES={label:'Size',choices:[{name:'Regular',delta:0},{name:'Large',delta:1.25}]};
 const BURGER_MENU=[
  {id:'smash',name:'Classic Smash Burger',cat:'Burgers',price:8.50,stock:40,avail:true,addons:BURGER_ADDONS,ingredients:CLASSIC_BUILD},
