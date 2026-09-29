@@ -158,7 +158,7 @@ main{padding:16px; max-width:1200px; margin:0 auto; padding-bottom:48px;}
 .addon-row input[type=checkbox]{width:22px; height:22px;}
 .addon-row .an{flex:1; font-weight:600;}
 .addon-row .ap{color:var(--muted);}
-.onside{display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted);}
+.onside{display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted); padding:8px 4px;}
 .onside input{width:20px; height:20px;}
 .preview{
   background:var(--cream); border:2px dashed var(--brand); border-radius:var(--radius);

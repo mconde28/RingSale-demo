@@ -247,7 +247,7 @@ function renderCustomize(){
         const st=cust.addons[i];
         return '<div class="addon-row"><input type="checkbox"'+(st.on?' checked':'')+' onchange="custAddon('+i+')">'+
         '<span class="an">'+esc(a.name)+'</span><span class="ap">+'+M(a.price)+'</span>'+
-        '<label class="onside"><input type="checkbox"'+(st.onSide?' checked':'')+(st.on?'':' disabled')+' onchange="custOnSide('+i+')">On side</label></div>';
+        '<label class="onside"><input type="checkbox"'+(st.onSide?' checked':'')+' onchange="custOnSide('+i+')">On side</label></div>';
       }).join('')+'</div>';
   }
   const det=[];
@@ -269,7 +269,7 @@ function renderCustomize(){
 function custSize(i){cust.sizeIdx=i;renderCustomize();}
 function custQty(d){const it=cust.item;cust.qty=Math.min(Math.max(1,cust.qty+d),Math.max(1,it.stock));renderCustomize();}
 function custAddon(i){cust.addons[i].on=!cust.addons[i].on;if(!cust.addons[i].on)cust.addons[i].onSide=false;renderCustomize();}
-function custOnSide(i){cust.addons[i].onSide=!cust.addons[i].onSide;renderCustomize();}
+function custOnSide(i){const st=cust.addons[i];if(!st.on){st.on=true;st.onSide=true;}else{st.onSide=!st.onSide;}renderCustomize();}
 function addToTicket(){
   const it=cust.item,u=custUnit();
   const addons=(it.addons||[]).filter(function(a,i){return cust.addons[i].on;}).map(function(a,i){
