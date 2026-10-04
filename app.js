@@ -5,7 +5,7 @@ const $=s=>document.querySelector(s);
 const R=n=>Math.round(n*100)/100;
 const M=n=>'$'+R(n).toFixed(2);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const APP_VERSION='v13';   // bump with the SW cache version on every deploy
+const APP_VERSION='v14';   // bump with the SW cache version on every deploy
 
 /* ---------------- menu data ---------------- */
 const TACO_ADDONS=[
@@ -234,15 +234,19 @@ function menuTap(id){
   }
   openCustomize(id);
 }
+function isOut(i){return !i.avail||i.stock<=0;}
 function renderMenu(){
   const items=MENU.filter(function(i){return activeCat==='All'||i.cat===activeCat;});
   const grid=$('#menu-grid');
   grid.classList.toggle('mode86',eightysix);
   grid.innerHTML=items.map(function(i){
-    return '<button class="menu-item'+(i.avail?'':' out')+'" onclick="menuTap(\''+i.id+'\')">'+
+    const out=isOut(i);
+    const st=eightysix?(i.avail?'Tap to 86':'86\u2019d — tap to restore')
+      :(i.avail?(i.stock>0?('In stock: '+i.stock):'Out of stock'):'86\u2019d');
+    return '<button class="menu-item'+(out?' out':'')+'" onclick="menuTap(\''+i.id+'\')">'+
     '<span class="nm">'+esc(i.name)+'</span>'+
     '<span class="pr">'+M(i.price)+'</span>'+
-    '<span class="st">'+(eightysix?(i.avail?'Tap to 86':'86\u2019d — tap to restore'):(i.avail?('In stock: '+i.stock):'86\u2019d'))+'</span>'+
+    '<span class="st">'+st+'</span>'+
     '</button>';
   }).join('')||'<p class="ticket-empty">No items in this category.</p>';
 }
@@ -250,7 +254,7 @@ function renderMenu(){
 /* ---------------- item customization ---------------- */
 function openCustomize(id){
   const item=MENU.find(function(i){return i.id===id;});
-  if(!item||!item.avail)return;
+  if(!item||isOut(item))return;
   cust={item:item,qty:1,sizeIdx:0,holds:(item.ingredients||[]).map(function(){return false;}),addons:(item.addons||[]).map(function(){return{on:false,onSide:false};})};
   renderCustomize();
 }
@@ -469,7 +473,7 @@ function completeSale(tender,tendered,change){
   });
   sales.push(sale);
   ticket=[];discountPct=0;ticketNote='';
-  saveState();renderTicket();
+  saveState();renderTicket();renderMenu();
   const rows=sale.lines.map(function(l){
     return '<div class="r" style="display:flex;justify-content:space-between"><span>'+l.qty+' × '+esc(l.name)+'</span><span>'+M(l.total)+'</span></div>';
   }).join('');
